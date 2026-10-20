@@ -36,7 +36,7 @@ export const club = {
     email: '',
   },
   links: {
-    cricheroes: '', // team profile URL
+    cricheroes: 'https://cricheroes.com/team-profile/12284290/ak-sports-club/members', // team profile URL
     instagram: '',
     facebook: '',
     youtube: '',
