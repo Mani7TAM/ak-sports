@@ -6,7 +6,7 @@ import tailwindcss from '@tailwindcss/vite';
 // https://astro.build/config
 export default defineConfig({
   // TODO: set to the real address once the Cloudflare Pages project exists.
-  site: 'https://aksportsclub.pages.dev',
+  site: 'https://ak-sports-9el.pages.dev',
   fonts: [
     {
       provider: fontProviders.google(),
