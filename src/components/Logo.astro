@@ -1,0 +1,24 @@
+---
+import { Image } from 'astro:assets';
+import logo from '../assets/logo.png';
+
+interface Props {
+  /** Rendered height in CSS pixels. */
+  height: number;
+  /** Load immediately (for logos above the fold). */
+  eager?: boolean;
+  class?: string;
+}
+const { height, eager = false, class: className } = Astro.props;
+---
+
+{/* alt is empty because the club name always appears next to the logo as text. */}
+<Image
+  src={logo}
+  alt=""
+  height={height}
+  width={Math.round((height * logo.width) / logo.height)}
+  densities={[1, 2]}
+  loading={eager ? 'eager' : 'lazy'}
+  class={className}
+/>

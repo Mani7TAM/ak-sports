@@ -1,0 +1,87 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import MatchCard from '../components/MatchCard.astro';
+import ResultRow from '../components/ResultRow.astro';
+import { club } from '../data/club';
+import { bySeason, getMatches, record, showUntil } from '../lib/matches';
+
+const { upcoming, results } = await getMatches();
+const seasons = bySeason(results);
+---
+
+<Layout title="Fixtures & results" description={`Upcoming fixtures and recent results for ${club.name}.`}>
+  <PageHero
+    eyebrow="Fixtures"
+    title="Fixtures & results"
+    intro="Where we're playing next and how we got on. Full scorecards are on CricHeroes."
+  />
+
+  <section class="container-page py-14">
+    <h2 class="heading">Upcoming</h2>
+    <div data-fixtures class="mt-6 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+      {
+        upcoming.map((m) => (
+          <div data-until={showUntil(m.data)}>
+            <MatchCard match={m.data} />
+          </div>
+        ))
+      }
+    </div>
+    <p data-no-fixtures hidden={upcoming.length > 0} class="card mt-6 text-stone-600">
+      No fixtures scheduled right now. Check back soon.
+    </p>
+  </section>
+
+  <section class="border-t border-stone-200 bg-white">
+    <div class="container-page py-14">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <h2 class="heading">Results</h2>
+        {
+          seasons.length > 1 && (
+            <nav aria-label="Seasons" class="flex flex-wrap gap-2 text-sm">
+              {seasons.map(([season]) => (
+                <a href={`#season-${season}`} class="rounded-full border border-stone-300 px-3 py-1 font-semibold text-stone-700 hover:bg-stone-50">
+                  {season}
+                </a>
+              ))}
+            </nav>
+          )
+        }
+      </div>
+
+      {
+        seasons.map(([season, matches]) => {
+          const r = record(matches);
+          return (
+            <section id={`season-${season}`} class="mt-10 scroll-mt-24">
+              <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1 border-b-2 border-brand-800 pb-2">
+                <h3 class="font-display text-2xl font-bold text-brand-950 uppercase">{season} season</h3>
+                <p class="text-sm font-medium text-stone-500">
+                  Played {r.played} · Won {r.won} · Lost {r.lost}
+                  {r.tied > 0 && ` · Tied ${r.tied}`}
+                  {r.noResult > 0 && ` · No result ${r.noResult}`}
+                </p>
+              </div>
+              <ul class="divide-y divide-stone-100">
+                {matches.map((m) => (
+                  <li>
+                    <ResultRow match={m.data} />
+                  </li>
+                ))}
+              </ul>
+            </section>
+          )
+        })
+      }
+      {results.length === 0 && <p class="card mt-6 text-stone-600">Results will appear here after our first match.</p>}
+    </div>
+  </section>
+</Layout>
+
+<script>
+  // Hide fixtures that have finished since the last build.
+  const fixtures = [...document.querySelectorAll<HTMLElement>('[data-fixtures] [data-until]')];
+  fixtures.forEach((el) => (el.hidden = Number(el.dataset.until) <= Date.now()));
+  document.querySelector<HTMLElement>('[data-no-fixtures]')!.hidden = fixtures.some((el) => !el.hidden);
+</script>

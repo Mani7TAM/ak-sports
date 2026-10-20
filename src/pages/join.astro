@@ -1,0 +1,119 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import { club, whatsappLink } from '../data/club';
+
+const whatsapp = whatsappLink(`Hi, I'd like to join ${club.name}.`);
+const steps = [
+  { title: 'Get in touch', text: 'Fill in the form, or message us on WhatsApp.' },
+  { title: 'Come to a net session', text: 'Train with us so you can meet the team and we can see you play.' },
+  { title: 'Join the squad', text: "We'll add you to the team group and our CricHeroes squad." },
+];
+const follow = [
+  { href: club.links.cricheroes, label: 'CricHeroes' },
+  { href: club.links.instagram, label: 'Instagram' },
+  { href: club.links.facebook, label: 'Facebook' },
+  { href: club.links.youtube, label: 'YouTube' },
+].filter((l) => l.href);
+---
+
+<Layout title="Join the club" description={`Want to play cricket with ${club.name}? Here's how to join.`}>
+  <PageHero
+    eyebrow="Join us"
+    title={`Play for ${club.shortName}`}
+    intro="Batters, bowlers, keepers, all-rounders: if you love the game, there's a place for you. Here's how to get involved."
+  />
+
+  <section class="container-page grid gap-10 py-14 lg:grid-cols-5">
+    <div class="space-y-8 lg:col-span-2">
+      <div>
+        <h2 class="heading">How it works</h2>
+        <ol class="mt-6 space-y-5">
+          {
+            steps.map((s, i) => (
+              <li class="flex gap-4">
+                <span class="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-800 font-display text-xl font-bold text-accent-400">
+                  {i + 1}
+                </span>
+                <div>
+                  <p class="font-semibold text-brand-950">{s.title}</p>
+                  <p class="text-stone-600">{s.text}</p>
+                </div>
+              </li>
+            ))
+          }
+        </ol>
+      </div>
+
+      <div class="card">
+        <p class="eyebrow text-brand-600">Practice</p>
+        <ul class="mt-2 space-y-1 text-stone-700">
+          {club.practice.map((p) => <li>{p.days}, {p.time}</li>)}
+        </ul>
+        <p class="mt-1 text-stone-700">
+          {club.ground.name}
+          {
+            club.ground.mapsUrl && (
+              <a href={club.ground.mapsUrl} target="_blank" rel="noopener" class="link-arrow ml-1">
+                Directions →
+              </a>
+            )
+          }
+        </p>
+      </div>
+
+      {
+        (whatsapp || club.contact.email || follow.length > 0) && (
+          <div class="card">
+            <p class="eyebrow text-brand-600">Contact</p>
+            <div class="mt-3 flex flex-wrap gap-3">
+              {whatsapp && (
+                <a href={whatsapp} target="_blank" rel="noopener" class="btn btn-brand">
+                  Message us on WhatsApp
+                </a>
+              )}
+              {club.contact.email && (
+                <a href={`mailto:${club.contact.email}`} class="btn border border-stone-300 hover:bg-stone-50">
+                  {club.contact.email}
+                </a>
+              )}
+            </div>
+            {follow.length > 0 && (
+              <p class="mt-4 text-sm text-stone-600">
+                Follow us:{' '}
+                {follow.map((l, i) => (
+                  <>
+                    {i > 0 && ' · '}
+                    <a href={l.href} target="_blank" rel="noopener" class="font-semibold text-brand-700 hover:underline">
+                      {l.label}
+                    </a>
+                  </>
+                ))}
+              </p>
+            )}
+          </div>
+        )
+      }
+    </div>
+
+    <div class="lg:col-span-3">
+      {
+        club.joinFormUrl ? (
+          <iframe
+            src={club.joinFormUrl}
+            title="Join the club form"
+            loading="lazy"
+            class="h-[1100px] w-full rounded-2xl border border-stone-200 bg-white"
+          />
+        ) : (
+          <div class="card flex h-full min-h-64 flex-col items-center justify-center text-center">
+            <p class="font-display text-3xl font-bold text-brand-950 uppercase">Sign-up form coming soon</p>
+            <p class="mt-2 max-w-sm text-stone-600">
+              Until then, come along to a practice session and talk to any of us.
+            </p>
+          </div>
+        )
+      }
+    </div>
+  </section>
+</Layout>

@@ -1,0 +1,64 @@
+---
+import { Image } from 'astro:assets';
+import type { Player } from '../lib/squad';
+
+interface Props {
+  player: Player;
+}
+const { data: p } = Astro.props.player;
+
+const initials = p.name
+  .split(/\s+/)
+  .map((w) => w[0])
+  .slice(0, 2)
+  .join('')
+  .toUpperCase();
+const styles = [p.battingStyle, p.bowlingStyle].filter(Boolean).join(' · ');
+const badge = p.captain ? 'Captain' : p.viceCaptain ? 'Vice-captain' : undefined;
+---
+
+<article class="overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm">
+  <div class="relative aspect-[4/5] bg-gradient-to-br from-brand-700 to-brand-950">
+    {
+      p.photo ? (
+        <Image
+          src={p.photo}
+          alt={p.name}
+          widths={[240, 400, 600]}
+          sizes="(min-width: 1024px) 270px, (min-width: 640px) 30vw, 50vw"
+          class="h-full w-full object-cover"
+        />
+      ) : (
+        <div class="flex h-full items-center justify-center font-display text-6xl font-bold text-white/20" aria-hidden="true">
+          {initials}
+        </div>
+      )
+    }
+    {
+      badge && (
+        <span class="absolute top-3 left-3 rounded-full bg-accent-400 px-2.5 py-0.5 text-xs font-bold text-brand-950 uppercase">
+          {badge}
+        </span>
+      )
+    }
+    {
+      p.number !== undefined && (
+        <span class="absolute right-3 bottom-1 font-display text-4xl font-bold text-white/90 drop-shadow">
+          {p.number}
+        </span>
+      )
+    }
+  </div>
+  <div class="p-3 sm:p-4">
+    <h3 class="font-display text-lg leading-tight font-bold text-brand-950 uppercase sm:text-xl">{p.name}</h3>
+    <p class="text-sm font-semibold text-brand-600">{p.role}</p>
+    {styles && <p class="mt-1 text-xs text-stone-500 sm:text-sm">{styles}</p>}
+    {
+      p.cricheroesUrl && (
+        <a href={p.cricheroesUrl} target="_blank" rel="noopener" class="link-arrow mt-2">
+          CricHeroes profile →
+        </a>
+      )
+    }
+  </div>
+</article>

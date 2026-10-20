@@ -1,0 +1,48 @@
+---
+interface Props {
+  caption: string;
+  columns: { label: string; title: string }[];
+  rows: { name: string; cells: (string | number)[] }[];
+  /** Index of the column the table is sorted by. */
+  sortedBy: number;
+}
+const { caption, columns, rows, sortedBy } = Astro.props;
+---
+
+<div class="overflow-x-auto rounded-2xl border border-stone-200 bg-white">
+  <table class="w-full min-w-[640px] text-sm tabular-nums">
+    <caption class="sr-only">{caption}</caption>
+    <thead class="border-b border-stone-200 bg-stone-50 text-xs tracking-wider text-stone-500 uppercase">
+      <tr>
+        <th scope="col" class="sticky left-0 bg-stone-50 px-4 py-3 text-left font-semibold">Player</th>
+        {
+          columns.map((c, i) => (
+            <th
+              scope="col"
+              class:list={['px-3 py-3 text-right font-semibold', i === sortedBy && 'text-brand-700']}
+              aria-sort={i === sortedBy ? 'descending' : undefined}
+            >
+              <abbr title={c.title} class="no-underline">{c.label}</abbr>
+            </th>
+          ))
+        }
+      </tr>
+    </thead>
+    <tbody class="divide-y divide-stone-100">
+      {
+        rows.map((r) => (
+          <tr>
+            <th scope="row" class="sticky left-0 bg-white px-4 py-3 text-left font-semibold whitespace-nowrap text-stone-800">
+              {r.name}
+            </th>
+            {r.cells.map((cell, i) => (
+              <td class:list={['px-3 py-3 text-right', i === sortedBy ? 'font-bold text-brand-800' : 'text-stone-600']}>
+                {cell}
+              </td>
+            ))}
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</div>

@@ -1,0 +1,35 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import PlayerCard from '../components/PlayerCard.astro';
+import { club } from '../data/club';
+import { getSquad, roleGroups, type Player } from '../lib/squad';
+
+const squad = await getSquad();
+const captain = squad.find((p) => p.data.captain);
+const groups = (Object.entries(roleGroups) as [Player['data']['role'], string][])
+  .map(([role, heading]) => ({ heading, players: squad.filter((p) => p.data.role === role) }))
+  .filter((g) => g.players.length > 0);
+---
+
+<Layout title="Squad" description={`Meet the ${club.name} squad: batters, bowlers, all-rounders and keepers.`}>
+  <PageHero
+    eyebrow="The squad"
+    title="Meet the team"
+    intro={`${squad.length} players${captain ? `, led by ${captain.data.name}` : ''}.`}
+  />
+
+  {
+    groups.map((g, i) => (
+      <section class:list={['container-page', i === 0 ? 'pt-14' : 'pt-10', i === groups.length - 1 ? 'pb-16' : 'pb-10']}>
+        <h2 class="heading flex items-baseline gap-3">
+          {g.heading}
+          <span class="font-sans text-base font-medium text-stone-400 normal-case">{g.players.length}</span>
+        </h2>
+        <div class="mt-6 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+          {g.players.map((p) => <PlayerCard player={p} />)}
+        </div>
+      </section>
+    ))
+  }
+</Layout>

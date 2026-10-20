@@ -1,0 +1,65 @@
+[
+  {
+    "id": "your-name",
+    "name": "Your Name",
+    "number": 7,
+    "role": "All-rounder",
+    "battingStyle": "Right-hand bat",
+    "bowlingStyle": "Right-arm medium",
+    "captain": true
+  },
+  {
+    "id": "player-two",
+    "name": "Player Two",
+    "number": 18,
+    "role": "Batter",
+    "battingStyle": "Left-hand bat",
+    "viceCaptain": true
+  },
+  {
+    "id": "player-three",
+    "name": "Player Three",
+    "number": 1,
+    "role": "Wicket-keeper",
+    "battingStyle": "Right-hand bat"
+  },
+  {
+    "id": "player-four",
+    "name": "Player Four",
+    "number": 45,
+    "role": "Batter",
+    "battingStyle": "Right-hand bat"
+  },
+  {
+    "id": "player-five",
+    "name": "Player Five",
+    "number": 10,
+    "role": "All-rounder",
+    "battingStyle": "Left-hand bat",
+    "bowlingStyle": "Slow left-arm orthodox"
+  },
+  {
+    "id": "player-six",
+    "name": "Player Six",
+    "number": 33,
+    "role": "Bowler",
+    "battingStyle": "Right-hand bat",
+    "bowlingStyle": "Right-arm fast"
+  },
+  {
+    "id": "player-seven",
+    "name": "Player Seven",
+    "number": 99,
+    "role": "Bowler",
+    "battingStyle": "Right-hand bat",
+    "bowlingStyle": "Right-arm off-break"
+  },
+  {
+    "id": "player-eight",
+    "name": "Player Eight",
+    "number": 23,
+    "role": "Bowler",
+    "battingStyle": "Left-hand bat",
+    "bowlingStyle": "Left-arm medium-fast"
+  }
+]

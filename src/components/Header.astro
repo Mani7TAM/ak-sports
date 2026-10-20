@@ -1,0 +1,76 @@
+---
+import Logo from './Logo.astro';
+import { club } from '../data/club';
+import { nav } from '../data/nav';
+
+const path = Astro.url.pathname;
+const current = (href: string) => (path.startsWith(href) ? 'page' : undefined);
+---
+
+<header class="sticky top-0 z-40 border-b border-white/10 bg-brand-950/95 text-white backdrop-blur">
+  <nav class="container-page flex h-16 items-center justify-between" aria-label="Main">
+    <a href="/" class="flex items-center gap-2.5">
+      <Logo height={44} eager class="h-11 w-auto" />
+      <span class="font-display text-xl font-bold tracking-wide uppercase">{club.name}</span>
+    </a>
+
+    <ul class="hidden items-center gap-1 lg:flex">
+      {
+        nav.map((l) => (
+          <li>
+            <a
+              href={l.href}
+              aria-current={current(l.href)}
+              class="rounded-md px-3 py-2 text-sm font-medium text-white/75 hover:text-white aria-[current=page]:text-accent-400"
+            >
+              {l.label}
+            </a>
+          </li>
+        ))
+      }
+      <li class="ml-2"><a href="/join/" class="btn btn-primary">Join the club</a></li>
+    </ul>
+
+    <button
+      type="button"
+      class="-mr-2 rounded-md p-2 text-white/80 hover:text-white lg:hidden"
+      aria-controls="mobile-menu"
+      aria-expanded="false"
+      data-menu-toggle
+    >
+      <span class="sr-only">Menu</span>
+      <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path stroke-linecap="round" d="M4 7h16M4 12h16M4 17h16"></path>
+      </svg>
+    </button>
+  </nav>
+
+  <div id="mobile-menu" class="hidden border-t border-white/10 lg:hidden" data-menu>
+    <ul class="container-page space-y-1 py-3">
+      {
+        nav.map((l) => (
+          <li>
+            <a
+              href={l.href}
+              aria-current={current(l.href)}
+              class="block rounded-md px-3 py-2 font-medium text-white/80 hover:bg-white/5 aria-[current=page]:text-accent-400"
+            >
+              {l.label}
+            </a>
+          </li>
+        ))
+      }
+      <li class="pt-2"><a href="/join/" class="btn btn-primary w-full">Join the club</a></li>
+    </ul>
+  </div>
+</header>
+
+<script>
+  const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
+  const menu = document.querySelector<HTMLElement>('[data-menu]');
+  toggle?.addEventListener('click', () => {
+    const open = toggle.getAttribute('aria-expanded') === 'true';
+    toggle.setAttribute('aria-expanded', String(!open));
+    menu?.classList.toggle('hidden', open);
+  });
+</script>

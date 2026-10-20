@@ -1,0 +1,65 @@
+---
+import { Image } from 'astro:assets';
+import Layout from '../../layouts/Layout.astro';
+import PageHero from '../../components/PageHero.astro';
+import { club } from '../../data/club';
+import { getAlbums } from '../../lib/gallery';
+import { formatDay } from '../../lib/matches';
+
+const albums = await getAlbums();
+---
+
+<Layout title="Gallery" description={`Photos from ${club.name} matches, tournaments and team days.`}>
+  <PageHero eyebrow="Gallery" title="Photos" intro="Match days, trophies and everything in between." />
+
+  <section class="container-page py-14">
+    {
+      albums.length > 0 ? (
+        <ul class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {albums.map((a) => {
+            const local = a.photos.length > 0;
+            return (
+              <li>
+                <a
+                  href={local ? `/gallery/${a.id}/` : a.externalUrl}
+                  target={local ? undefined : '_blank'}
+                  rel={local ? undefined : 'noopener'}
+                  class="group block overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-sm"
+                >
+                  <div class="aspect-[4/3] overflow-hidden bg-brand-900">
+                    {local ? (
+                      <Image
+                        src={a.photos[0].src}
+                        alt=""
+                        widths={[400, 700]}
+                        sizes="(min-width: 1024px) 360px, (min-width: 640px) 45vw, 100vw"
+                        class="h-full w-full object-cover transition duration-300 group-hover:scale-105"
+                      />
+                    ) : (
+                      <div class="bg-outfield flex h-full items-center justify-center text-white/40" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" class="h-14 w-14" fill="none" stroke="currentColor" stroke-width="1.5">
+                          <path d="M3 8a2 2 0 0 1 2-2h2l2-2h6l2 2h2a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" />
+                          <circle cx="12" cy="13" r="4" />
+                        </svg>
+                      </div>
+                    )}
+                  </div>
+                  <div class="p-4">
+                    <h2 class="font-display text-2xl leading-tight font-bold text-brand-950 uppercase group-hover:text-brand-700">
+                      {a.title}
+                    </h2>
+                    <p class="mt-1 text-sm text-stone-500">
+                      {formatDay(a.date)} · {local ? `${a.photos.length} photos` : 'External album ↗'}
+                    </p>
+                  </div>
+                </a>
+              </li>
+            );
+          })}
+        </ul>
+      ) : (
+        <p class="card text-stone-600">Photos coming soon.</p>
+      )
+    }
+  </section>
+</Layout>

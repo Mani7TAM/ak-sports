@@ -1,0 +1,46 @@
+---
+import { fmt, leaders, type Season } from '../lib/stats';
+
+interface Props {
+  season: Season;
+}
+const { mostRuns, mostWickets, highestScore, bestBowling } = leaders(Astro.props.season);
+
+const cards = [
+  mostRuns && {
+    label: 'Most runs',
+    value: mostRuns.batting.runs,
+    name: mostRuns.player.data.name,
+    detail: `Avg ${fmt(mostRuns.batting.average)} · SR ${fmt(mostRuns.batting.strikeRate)}`,
+  },
+  mostWickets && {
+    label: 'Most wickets',
+    value: mostWickets.bowling.wickets,
+    name: mostWickets.player.data.name,
+    detail: `Econ ${fmt(mostWickets.bowling.economy)} · ${mostWickets.bowling.overs} overs`,
+  },
+  highestScore && {
+    label: 'Highest score',
+    value: highestScore.batting.highest,
+    name: highestScore.player.data.name,
+  },
+  bestBowling && {
+    label: 'Best bowling',
+    value: bestBowling.bowling.best,
+    name: bestBowling.player.data.name,
+  },
+].filter((c) => !!c);
+---
+
+<ul class="grid grid-cols-2 gap-4 lg:grid-cols-4">
+  {
+    cards.map((c) => (
+      <li class="card">
+        <p class="eyebrow text-brand-600">{c.label}</p>
+        <p class="mt-2 font-display text-5xl leading-none font-bold text-brand-950 tabular-nums">{c.value}</p>
+        <p class="mt-2 font-semibold text-stone-800">{c.name}</p>
+        {c.detail && <p class="text-sm text-stone-500">{c.detail}</p>}
+      </li>
+    ))
+  }
+</ul>

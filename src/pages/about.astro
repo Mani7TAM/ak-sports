@@ -1,0 +1,93 @@
+---
+import Layout from '../layouts/Layout.astro';
+import PageHero from '../components/PageHero.astro';
+import { club } from '../data/club';
+
+const { ground } = club;
+---
+
+<Layout title="About" description={`The story of ${club.name}, our home ground and practice timings.`}>
+  <PageHero eyebrow="About us" title="Our story" intro={club.description} />
+
+  <section class="container-page grid gap-10 py-14 lg:grid-cols-3">
+    <div class="space-y-5 text-lg leading-relaxed text-stone-700 lg:col-span-2">
+      {club.story.map((para) => <p>{para}</p>)}
+    </div>
+    <aside class="card h-fit">
+      <dl class="space-y-4 text-sm">
+        <div>
+          <dt class="eyebrow text-brand-600">Founded</dt>
+          <dd class="mt-1 font-display text-3xl font-bold text-brand-950">{club.founded}</dd>
+        </div>
+        <div>
+          <dt class="eyebrow text-brand-600">Home ground</dt>
+          <dd class="mt-1 text-base text-stone-700">{ground.name}</dd>
+        </div>
+        <div>
+          <dt class="eyebrow text-brand-600">Practice</dt>
+          {club.practice.map((p) => <dd class="mt-1 text-base text-stone-700">{p.days}, {p.time}</dd>)}
+        </div>
+      </dl>
+    </aside>
+  </section>
+
+  {
+    club.achievements.length > 0 && (
+      <section class="border-y border-stone-200 bg-white">
+        <div class="container-page py-14">
+          <p class="eyebrow text-brand-600">Honours</p>
+          <h2 class="heading mt-1">Trophy cabinet</h2>
+          <ul class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            {club.achievements.map((a) => (
+              <li class="flex items-center gap-4 rounded-xl bg-stone-50 p-4">
+                <span class="font-display text-2xl font-bold text-accent-600">{a.year}</span>
+                <span class="font-medium text-stone-800">{a.title}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="container-page py-14">
+    <p class="eyebrow text-brand-600">Where we play</p>
+    <h2 class="heading mt-1">{ground.name}</h2>
+    {ground.address && <p class="mt-3 max-w-xl text-stone-600">{ground.address}</p>}
+    {
+      ground.mapsUrl && (
+        <a href={ground.mapsUrl} target="_blank" rel="noopener" class="link-arrow mt-3">
+          Get directions →
+        </a>
+      )
+    }
+    {
+      ground.mapEmbedUrl && (
+        <iframe
+          src={ground.mapEmbedUrl}
+          title={`Map of ${ground.name}`}
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          class="mt-6 aspect-[16/9] w-full rounded-2xl border border-stone-200"
+        />
+      )
+    }
+  </section>
+
+  {
+    club.committee.length > 0 && (
+      <section class="container-page pb-16">
+        <p class="eyebrow text-brand-600">Who runs the club</p>
+        <h2 class="heading mt-1">Committee</h2>
+        <ul class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+          {club.committee.map((c) => (
+            <li class="card">
+              <p class="eyebrow text-brand-600">{c.role}</p>
+              <p class="mt-1 font-display text-2xl font-bold text-brand-950 uppercase">{c.name}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+    )
+  }
+</Layout>

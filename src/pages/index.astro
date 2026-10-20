@@ -1,0 +1,159 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Logo from '../components/Logo.astro';
+import MatchCard from '../components/MatchCard.astro';
+import PlayerCard from '../components/PlayerCard.astro';
+import SeasonLeaders from '../components/SeasonLeaders.astro';
+import StatStrip from '../components/StatStrip.astro';
+import { club } from '../data/club';
+import { getMatches, record, showUntil } from '../lib/matches';
+import { getSquad } from '../lib/squad';
+import { getSeasons } from '../lib/stats';
+
+const { upcoming, results } = await getMatches();
+const latest = results[0];
+const squad = await getSquad();
+const [season] = await getSeasons();
+const allTime = record(results);
+---
+
+<Layout>
+  <section class="bg-outfield relative overflow-hidden text-white">
+    <div class="container-page grid items-center gap-8 pt-16 pb-28 sm:pt-20 sm:pb-36 md:grid-cols-[1fr_auto]">
+      <div>
+        <p class="eyebrow text-accent-400">Est. {club.founded}{club.city && ` · ${club.city}`}</p>
+        <h1 class="mt-3 font-display text-6xl leading-[0.9] font-bold uppercase sm:text-8xl">{club.name}</h1>
+        <p class="mt-5 max-w-xl text-lg text-white/80 sm:text-xl">{club.tagline}</p>
+        <div class="mt-8 flex flex-wrap gap-3">
+          <a href="/join/" class="btn btn-primary">Join the club</a>
+          {
+            club.links.cricheroes ? (
+              <a href={club.links.cricheroes} target="_blank" rel="noopener" class="btn btn-ghost">
+                Follow us on CricHeroes
+              </a>
+            ) : (
+              <a href="/squad/" class="btn btn-ghost">Meet the squad</a>
+            )
+          }
+        </div>
+      </div>
+      <div class="relative hidden md:block">
+        <div class="absolute inset-10 rounded-full bg-accent-400/20 blur-3xl" aria-hidden="true"></div>
+        <Logo height={320} eager class="relative h-64 w-auto lg:h-80" />
+      </div>
+    </div>
+  </section>
+
+  <section class="container-page relative -mt-16 grid gap-5 md:grid-cols-2" aria-label="Matches">
+    <div data-next-match>
+      {
+        upcoming.map((m, i) => (
+          <div data-start={m.data.start.getTime()} data-until={showUntil(m.data)} hidden={i > 0} class="h-full">
+            <MatchCard match={m.data} label="Next match">
+              <p data-countdown class="mt-3 font-display text-xl font-bold text-accent-600 uppercase" />
+            </MatchCard>
+          </div>
+        ))
+      }
+      <div data-no-fixture hidden={upcoming.length > 0} class="card h-full">
+        <p class="eyebrow text-brand-600">Next match</p>
+        <p class="mt-3 text-stone-600">No fixtures scheduled right now. Check back soon.</p>
+      </div>
+    </div>
+
+    {
+      latest ? (
+        <MatchCard match={latest.data} label="Latest result" />
+      ) : (
+        <div class="card">
+          <p class="eyebrow text-brand-600">Latest result</p>
+          <p class="mt-3 text-stone-600">Results will appear here after our first match.</p>
+        </div>
+      )
+    }
+    <a href="/fixtures/" class="link-arrow justify-self-end md:col-span-2">All fixtures &amp; results →</a>
+  </section>
+
+  <section class="container-page py-14">
+    <StatStrip
+      items={[
+        { value: club.founded, label: 'Founded' },
+        { value: squad.length, label: 'Players' },
+        { value: allTime.played, label: 'Matches played' },
+        { value: allTime.won, label: 'Wins' },
+      ]}
+    />
+  </section>
+
+  {
+    season && (
+      <section class="container-page pb-16">
+        <div class="flex items-end justify-between gap-4">
+          <div>
+            <p class="eyebrow text-brand-600">{season.id} season</p>
+            <h2 class="heading mt-1">Leading the way</h2>
+          </div>
+          <a href="/stats/" class="link-arrow shrink-0">All stats →</a>
+        </div>
+        <div class="mt-6">
+          <SeasonLeaders season={season} />
+        </div>
+      </section>
+    )
+  }
+
+  <section class="container-page pb-16">
+    <div class="flex items-end justify-between gap-4">
+      <div>
+        <p class="eyebrow text-brand-600">The squad</p>
+        <h2 class="heading mt-1">Meet the team</h2>
+      </div>
+      <a href="/squad/" class="link-arrow shrink-0">Full squad →</a>
+    </div>
+    <div class="mt-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+      {squad.slice(0, 4).map((p) => <PlayerCard player={p} />)}
+    </div>
+  </section>
+
+  <section class="bg-accent-400">
+    <div class="container-page flex flex-col gap-6 py-12 sm:flex-row sm:items-center sm:justify-between">
+      <div>
+        <h2 class="font-display text-4xl leading-none font-bold text-brand-950 uppercase">Fancy a game?</h2>
+        <p class="mt-2 text-brand-950/80">
+          We practise {club.practice.map((p) => `${p.days}, ${p.time}`).join(' and ')} at {club.ground.name}. New players are always welcome.
+        </p>
+      </div>
+      <a href="/join/" class="btn btn-brand shrink-0 self-start sm:self-auto">How to join →</a>
+    </div>
+  </section>
+</Layout>
+
+<script>
+  // The page is static, so pick the next fixture in the browser: a fixture that has
+  // already finished stays hidden even if the site hasn't been rebuilt since.
+  const container = document.querySelector<HTMLElement>('[data-next-match]');
+  if (container) {
+    const fixtures = [...container.querySelectorAll<HTMLElement>('[data-until]')];
+    const next = fixtures.find((el) => Number(el.dataset.until) > Date.now());
+    fixtures.forEach((el) => (el.hidden = el !== next));
+    container.querySelector<HTMLElement>('[data-no-fixture]')!.hidden = Boolean(next);
+
+    const countdown = next?.querySelector<HTMLElement>('[data-countdown]');
+    if (next && countdown) {
+      const start = Number(next.dataset.start);
+      const render = () => (countdown.textContent = describe(start - Date.now()));
+      render();
+      setInterval(render, 60_000);
+    }
+  }
+
+  function describe(ms: number) {
+    if (ms <= 0) return 'Match day: in progress';
+    const mins = Math.floor(ms / 60_000);
+    const days = Math.floor(mins / 1440);
+    const hours = Math.floor((mins % 1440) / 60);
+    if (days > 0) return `Starts in ${days} day${days > 1 ? 's' : ''}${hours ? ` ${hours} hr` : ''}`;
+    if (hours > 0) return `Starts in ${hours} hr ${mins % 60} min`;
+    return `Starts in ${mins} min`;
+  }
+</script>

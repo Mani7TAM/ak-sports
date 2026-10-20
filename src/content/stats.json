@@ -1,0 +1,81 @@
+[
+  {
+    "id": "2026",
+    "updated": "2026-10-18",
+    "players": [
+      {
+        "player": "your-name",
+        "matches": 2,
+        "batting": { "innings": 2, "runs": 71, "balls": 52, "highest": "48" },
+        "bowling": { "innings": 2, "overs": "6", "runs": 44, "wickets": 2, "best": "1/18" }
+      },
+      {
+        "player": "player-two",
+        "matches": 2,
+        "batting": { "innings": 2, "notOuts": 1, "runs": 66, "balls": 49, "highest": "52*", "fifties": 1 }
+      },
+      {
+        "player": "player-three",
+        "matches": 2,
+        "batting": { "innings": 2, "runs": 38, "balls": 35, "highest": "27" }
+      },
+      {
+        "player": "player-four",
+        "matches": 2,
+        "batting": { "innings": 2, "runs": 54, "balls": 44, "highest": "41" }
+      },
+      {
+        "player": "player-five",
+        "matches": 2,
+        "batting": { "innings": 2, "notOuts": 1, "runs": 45, "balls": 30, "highest": "33*" },
+        "bowling": { "innings": 2, "overs": "8", "runs": 51, "wickets": 4, "best": "3/24" }
+      },
+      {
+        "player": "player-six",
+        "matches": 2,
+        "batting": { "innings": 1, "notOuts": 1, "runs": 6, "balls": 5, "highest": "6*" },
+        "bowling": { "innings": 2, "overs": "7.5", "maidens": 1, "runs": 49, "wickets": 3, "best": "2/21" }
+      },
+      {
+        "player": "player-seven",
+        "matches": 2,
+        "batting": { "innings": 1, "runs": 3, "balls": 6, "highest": "3" },
+        "bowling": { "innings": 2, "overs": "8", "runs": 58, "wickets": 1, "best": "1/26" }
+      },
+      {
+        "player": "player-eight",
+        "matches": 2,
+        "batting": { "innings": 1, "runs": 0, "balls": 2, "highest": "0" },
+        "bowling": { "innings": 2, "overs": "7", "runs": 47, "wickets": 3, "best": "2/19" }
+      }
+    ]
+  },
+  {
+    "id": "2025",
+    "updated": "2025-11-16",
+    "players": [
+      {
+        "player": "your-name",
+        "matches": 2,
+        "batting": { "innings": 2, "notOuts": 1, "runs": 84, "balls": 61, "highest": "55*", "fifties": 1 },
+        "bowling": { "innings": 2, "overs": "7", "runs": 41, "wickets": 4, "best": "3/17" }
+      },
+      {
+        "player": "player-two",
+        "matches": 2,
+        "batting": { "innings": 2, "runs": 63, "balls": 58, "highest": "39" }
+      },
+      {
+        "player": "player-five",
+        "matches": 2,
+        "batting": { "innings": 2, "runs": 41, "balls": 33, "highest": "29" },
+        "bowling": { "innings": 2, "overs": "8", "runs": 46, "wickets": 5, "best": "3/20" }
+      },
+      {
+        "player": "player-six",
+        "matches": 2,
+        "bowling": { "innings": 2, "overs": "8", "maidens": 1, "runs": 39, "wickets": 4, "best": "2/15" }
+      }
+    ]
+  }
+]

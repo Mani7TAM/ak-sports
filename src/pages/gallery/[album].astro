@@ -1,0 +1,144 @@
+---
+import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
+import { Image, getImage } from 'astro:assets';
+import Layout from '../../layouts/Layout.astro';
+import PageHero from '../../components/PageHero.astro';
+import { getAlbums } from '../../lib/gallery';
+import { formatDay } from '../../lib/matches';
+
+export const getStaticPaths = (async () => {
+  const albums = await getAlbums();
+  return albums.filter((a) => a.photos.length > 0).map((album) => ({ params: { album: album.id }, props: { album } }));
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+const { album } = Astro.props;
+
+const photos = await Promise.all(
+  album.photos.map(async (p, i) => ({
+    ...p,
+    alt: p.caption ?? `${album.title}, photo ${i + 1}`,
+    full: (await getImage({ src: p.src, width: Math.min(p.src.width, 1600), format: 'webp' })).src,
+  })),
+);
+---
+
+<Layout title={album.title} description={album.description ?? `Photos: ${album.title}`}>
+  <PageHero eyebrow={formatDay(album.date)} title={album.title} intro={album.description} />
+
+  <section class="container-page py-10">
+    <div class="flex flex-wrap items-center justify-between gap-3">
+      <a href="/gallery/" class="link-arrow">← All albums</a>
+      {
+        album.externalUrl && (
+          <a href={album.externalUrl} target="_blank" rel="noopener" class="link-arrow">
+            More photos ↗
+          </a>
+        )
+      }
+    </div>
+
+    <ul class="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-3 sm:gap-3 lg:grid-cols-4">
+      {
+        photos.map((p) => (
+          <li>
+            <button
+              type="button"
+              data-photo
+              data-full={p.full}
+              data-caption={p.caption}
+              class="block w-full overflow-hidden rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
+            >
+              <Image
+                src={p.src}
+                alt={p.alt}
+                widths={[300, 500]}
+                sizes="(min-width: 1024px) 270px, (min-width: 640px) 30vw, 50vw"
+                class="aspect-square w-full object-cover transition duration-300 hover:scale-105"
+              />
+            </button>
+          </li>
+        ))
+      }
+    </ul>
+  </section>
+
+  <dialog
+    data-lightbox
+    aria-label="Photo viewer"
+    class="m-0 h-dvh max-h-none w-dvw max-w-none bg-black/95 p-0 text-white backdrop:bg-black/80 open:flex open:flex-col"
+  >
+    <div class="flex items-center justify-between px-4 py-3 text-sm text-white/70">
+      <span data-counter></span>
+      <button type="button" data-close class="rounded-full p-2 hover:bg-white/10" aria-label="Close">
+        <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+          <path stroke-linecap="round" d="M6 6l12 12M18 6L6 18"></path>
+        </svg>
+      </button>
+    </div>
+    <figure class="flex flex-1 flex-col items-center justify-center px-2 pb-6 sm:px-16">
+      <img data-image alt="" class="max-h-[calc(100dvh-8rem)] max-w-full object-contain" />
+      <figcaption data-caption class="mt-3 text-center text-sm text-white/80"></figcaption>
+    </figure>
+    <button
+      type="button"
+      data-prev
+      class="absolute top-1/2 left-2 hidden -translate-y-1/2 rounded-full bg-white/10 p-3 hover:bg-white/20 sm:block"
+      aria-label="Previous photo"
+    >
+      <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M15 5l-7 7 7 7"></path>
+      </svg>
+    </button>
+    <button
+      type="button"
+      data-next
+      class="absolute top-1/2 right-2 hidden -translate-y-1/2 rounded-full bg-white/10 p-3 hover:bg-white/20 sm:block"
+      aria-label="Next photo"
+    >
+      <svg viewBox="0 0 24 24" class="h-6 w-6" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7"></path>
+      </svg>
+    </button>
+  </dialog>
+</Layout>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('[data-lightbox]')!;
+  const thumbs = [...document.querySelectorAll<HTMLButtonElement>('[data-photo]')];
+  const image = dialog.querySelector<HTMLImageElement>('[data-image]')!;
+  const caption = dialog.querySelector<HTMLElement>('[data-caption]')!;
+  const counter = dialog.querySelector<HTMLElement>('[data-counter]')!;
+  let index = 0;
+
+  const show = (i: number) => {
+    index = (i + thumbs.length) % thumbs.length;
+    const thumb = thumbs[index];
+    image.src = thumb.dataset.full!;
+    image.alt = thumb.querySelector('img')?.alt ?? '';
+    caption.textContent = thumb.dataset.caption ?? '';
+    counter.textContent = `${index + 1} / ${thumbs.length}`;
+  };
+
+  thumbs.forEach((thumb, i) =>
+    thumb.addEventListener('click', () => {
+      show(i);
+      dialog.showModal();
+    }),
+  );
+  dialog.querySelector('[data-prev]')!.addEventListener('click', () => show(index - 1));
+  dialog.querySelector('[data-next]')!.addEventListener('click', () => show(index + 1));
+  dialog.querySelector('[data-close]')!.addEventListener('click', () => dialog.close());
+  dialog.addEventListener('keydown', (e) => {
+    if (e.key === 'ArrowLeft') show(index - 1);
+    if (e.key === 'ArrowRight') show(index + 1);
+  });
+
+  // Swipe left/right on phones.
+  let touchX = 0;
+  dialog.addEventListener('touchstart', (e) => (touchX = e.touches[0].clientX), { passive: true });
+  dialog.addEventListener('touchend', (e) => {
+    const dx = e.changedTouches[0].clientX - touchX;
+    if (Math.abs(dx) > 50) show(index + (dx < 0 ? 1 : -1));
+  });
+</script>

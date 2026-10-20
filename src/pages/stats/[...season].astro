@@ -1,0 +1,151 @@
+---
+import type { GetStaticPaths, InferGetStaticPropsType } from 'astro';
+import Layout from '../../layouts/Layout.astro';
+import PageHero from '../../components/PageHero.astro';
+import SeasonLeaders from '../../components/SeasonLeaders.astro';
+import StatStrip from '../../components/StatStrip.astro';
+import StatsTable from '../../components/StatsTable.astro';
+import { club } from '../../data/club';
+import { formatDay, getMatches, record } from '../../lib/matches';
+import { fmt, getSeasons, tables } from '../../lib/stats';
+
+// The latest season lives at /stats/, older ones at /stats/<season>/.
+export const getStaticPaths = (async () => {
+  const seasons = await getSeasons();
+  if (!seasons.length) return [{ params: { season: undefined }, props: { season: undefined, seasons } }];
+  return seasons.map((season, i) => ({
+    params: { season: i === 0 ? undefined : season.id },
+    props: { season, seasons },
+  }));
+}) satisfies GetStaticPaths;
+
+type Props = InferGetStaticPropsType<typeof getStaticPaths>;
+const { season, seasons } = Astro.props;
+
+const href = (id: string) => (id === seasons[0].id ? '/stats/' : `/stats/${id}/`);
+const { results } = await getMatches();
+const team = season && record(results.filter((m) => m.data.season === season.id));
+const { batters, bowlers } = season ? tables(season) : { batters: [], bowlers: [] };
+const fullStatsUrl = season?.cricheroesUrl || club.links.cricheroes;
+---
+
+<Layout
+  title={season ? `${season.id} stats` : 'Stats'}
+  description={`Batting and bowling stats for ${club.name}${season ? `, ${season.id} season` : ''}.`}
+>
+  <PageHero
+    eyebrow="Stats"
+    title={season ? `${season.id} season` : 'Stats'}
+    intro={season?.updated ? `Numbers from CricHeroes, updated ${formatDay(season.updated)}.` : 'Numbers from CricHeroes.'}
+  >
+    {
+      seasons.length > 1 && (
+        <nav aria-label="Seasons" class="mt-6 flex flex-wrap gap-2">
+          {seasons.map((s) => (
+            <a
+              href={href(s.id)}
+              aria-current={s.id === season?.id ? 'page' : undefined}
+              class="rounded-full border border-white/25 px-4 py-1.5 text-sm font-semibold text-white/80 hover:bg-white/10 aria-[current=page]:border-accent-400 aria-[current=page]:bg-accent-400 aria-[current=page]:text-brand-950"
+            >
+              {s.id}
+            </a>
+          ))}
+        </nav>
+      )
+    }
+  </PageHero>
+
+  {
+    season ? (
+      <>
+        <section class="container-page py-14">
+          {team && team.played > 0 && (
+            <div class="mb-12">
+              <h2 class="heading">Team record</h2>
+              <div class="mt-6">
+                <StatStrip
+                  items={[
+                    { value: team.played, label: 'Played' },
+                    { value: team.won, label: 'Won' },
+                    { value: team.lost, label: 'Lost' },
+                    { value: team.winPct === undefined ? '–' : `${team.winPct}%`, label: 'Win rate' },
+                  ]}
+                />
+              </div>
+            </div>
+          )}
+          <h2 class="heading">Season leaders</h2>
+          <div class="mt-6">
+            <SeasonLeaders season={season} />
+          </div>
+        </section>
+
+        {batters.length > 0 && (
+          <section class="container-page pb-14">
+            <h2 class="heading">Batting</h2>
+            <div class="mt-6">
+              <StatsTable
+                caption={`Batting, ${season.id} season`}
+                sortedBy={3}
+                columns={[
+                  { label: 'M', title: 'Matches' },
+                  { label: 'Inn', title: 'Innings' },
+                  { label: 'NO', title: 'Not outs' },
+                  { label: 'Runs', title: 'Runs' },
+                  { label: 'HS', title: 'Highest score' },
+                  { label: 'Avg', title: 'Batting average' },
+                  { label: 'SR', title: 'Strike rate' },
+                  { label: '50s', title: 'Fifties' },
+                  { label: '100s', title: 'Hundreds' },
+                ]}
+                rows={batters.map(({ player, matches, batting: b }) => ({
+                  name: player.data.name,
+                  cells: [matches, b.innings, b.notOuts, b.runs, b.highest, fmt(b.average), fmt(b.strikeRate), b.fifties, b.hundreds],
+                }))}
+              />
+            </div>
+          </section>
+        )}
+
+        {bowlers.length > 0 && (
+          <section class="container-page pb-14">
+            <h2 class="heading">Bowling</h2>
+            <div class="mt-6">
+              <StatsTable
+                caption={`Bowling, ${season.id} season`}
+                sortedBy={5}
+                columns={[
+                  { label: 'M', title: 'Matches' },
+                  { label: 'Inn', title: 'Innings' },
+                  { label: 'Overs', title: 'Overs' },
+                  { label: 'Mdns', title: 'Maidens' },
+                  { label: 'Runs', title: 'Runs conceded' },
+                  { label: 'Wkts', title: 'Wickets' },
+                  { label: 'Best', title: 'Best bowling in an innings' },
+                  { label: 'Avg', title: 'Bowling average' },
+                  { label: 'Econ', title: 'Economy rate' },
+                ]}
+                rows={bowlers.map(({ player, matches, bowling: b }) => ({
+                  name: player.data.name,
+                  cells: [matches, b.innings, b.overs, b.maidens, b.runs, b.wickets, b.best, fmt(b.average), fmt(b.economy)],
+                }))}
+              />
+            </div>
+          </section>
+        )}
+
+        {fullStatsUrl && (
+          <div class="container-page pb-16">
+            <a href={fullStatsUrl} target="_blank" rel="noopener" class="link-arrow">
+              Full stats on CricHeroes →
+            </a>
+          </div>
+        )}
+      </>
+    ) : (
+      <section class="container-page py-14">
+        <p class="card text-stone-600">Stats will appear here once the season gets going.</p>
+      </section>
+    )
+  }
+</Layout>

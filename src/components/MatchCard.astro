@@ -1,0 +1,64 @@
+---
+import { club } from '../data/club';
+import { formatMatchDate, outcomes as outcome, type Match } from '../lib/matches';
+
+interface Props {
+  match: Match['data'];
+  label?: string;
+}
+const { match, label } = Astro.props;
+const { result } = match;
+const competition = [match.tournament, match.format].filter(Boolean).join(' · ');
+---
+
+<article class="card flex h-full flex-col">
+  <div class="flex items-center justify-between gap-3">
+    <p class="eyebrow text-brand-600">{label ?? competition}</p>
+    {
+      result && (
+        <span class={`rounded-full px-2.5 py-0.5 text-xs font-bold uppercase ${outcome[result.outcome].class}`}>
+          {outcome[result.outcome].text}
+        </span>
+      )
+    }
+  </div>
+
+  <h3 class="mt-3 font-display text-3xl leading-tight font-bold text-brand-950 uppercase">
+    {club.shortName} <span class="text-stone-400">vs</span>{' '}{match.opponent}
+  </h3>
+  {label && competition && <p class="text-sm font-medium text-stone-500">{competition}</p>}
+
+  {
+    result && (
+      <>
+        <dl class="mt-4 divide-y divide-stone-100 rounded-lg bg-stone-50 text-sm">
+          <div class="flex justify-between gap-4 px-3 py-2">
+            <dt class="font-medium text-stone-700">{club.name}</dt>
+            <dd class="font-semibold tabular-nums">{result.ourScore ?? '–'}</dd>
+          </div>
+          <div class="flex justify-between gap-4 px-3 py-2">
+            <dt class="text-stone-600">{match.opponent}</dt>
+            <dd class="tabular-nums text-stone-600">{result.theirScore ?? '–'}</dd>
+          </div>
+        </dl>
+        <p class="mt-3 font-semibold text-brand-800">{result.summary}</p>
+        {result.playerOfMatch && (
+          <p class="text-sm text-stone-500">Player of the match: {result.playerOfMatch}</p>
+        )}
+      </>
+    )
+  }
+
+  <p class="mt-4 text-sm text-stone-600">
+    <time datetime={match.start.toISOString()}>{formatMatchDate(match)}</time> · {match.venue}
+  </p>
+  <slot />
+
+  {
+    match.cricheroesUrl && (
+      <a href={match.cricheroesUrl} target="_blank" rel="noopener" class="link-arrow mt-auto pt-4">
+        {result ? 'Full scorecard on CricHeroes' : 'Match on CricHeroes'} →
+      </a>
+    )
+  }
+</article>

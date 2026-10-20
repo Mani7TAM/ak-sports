@@ -1,0 +1,61 @@
+---
+import Logo from './Logo.astro';
+import { club } from '../data/club';
+import { nav } from '../data/nav';
+
+const pages = [{ href: '/', label: 'Home' }, ...nav, { href: '/join/', label: 'Join the club' }];
+const follow = [
+  { href: club.links.cricheroes, label: 'CricHeroes' },
+  { href: club.links.instagram, label: 'Instagram' },
+  { href: club.links.facebook, label: 'Facebook' },
+  { href: club.links.youtube, label: 'YouTube' },
+].filter((l) => l.href);
+---
+
+<footer class="bg-brand-950 text-white/70">
+  <div class="container-page grid gap-10 py-12 sm:grid-cols-2 lg:grid-cols-4">
+    <div class="lg:col-span-2">
+      <a href="/" class="inline-flex items-center gap-3 text-white">
+        <Logo height={80} class="h-20 w-auto" />
+        <span class="font-display text-2xl font-bold tracking-wide uppercase">{club.name}</span>
+      </a>
+      <p class="mt-4 max-w-sm text-sm">{club.tagline}</p>
+    </div>
+
+    <nav aria-label="Footer">
+      <h2 class="eyebrow text-accent-400">Explore</h2>
+      <ul class="mt-4 space-y-2 text-sm">
+        {pages.map((p) => <li><a href={p.href} class="hover:text-white">{p.label}</a></li>)}
+      </ul>
+    </nav>
+
+    {
+      (follow.length > 0 || club.contact.email) && (
+        <div>
+          <h2 class="eyebrow text-accent-400">Follow &amp; contact</h2>
+          <ul class="mt-4 space-y-2 text-sm">
+            {follow.map((l) => (
+              <li>
+                <a href={l.href} target="_blank" rel="noopener" class="hover:text-white">
+                  {l.label}
+                </a>
+              </li>
+            ))}
+            {club.contact.email && (
+              <li>
+                <a href={`mailto:${club.contact.email}`} class="hover:text-white">
+                  {club.contact.email}
+                </a>
+              </li>
+            )}
+          </ul>
+        </div>
+      )
+    }
+  </div>
+  <div class="border-t border-white/10">
+    <p class="container-page py-5 text-xs text-white/50">
+      © {new Date().getFullYear()} {club.name}
+    </p>
+  </div>
+</footer>

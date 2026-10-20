@@ -1,0 +1,82 @@
+[
+  {
+    "id": "2025-11-09-opponent-e",
+    "date": "2025-11-09",
+    "time": "07:00",
+    "opponent": "Opponent E",
+    "venue": "Home ground",
+    "tournament": "Friendly",
+    "format": "T20",
+    "result": {
+      "outcome": "won",
+      "ourScore": "148/7 (20)",
+      "theirScore": "139 (19.4)",
+      "summary": "Won by 9 runs",
+      "playerOfMatch": "Your Name"
+    }
+  },
+  {
+    "id": "2025-11-16-opponent-f",
+    "date": "2025-11-16",
+    "time": "07:00",
+    "opponent": "Opponent F",
+    "venue": "Away ground",
+    "tournament": "Friendly",
+    "format": "T20",
+    "result": {
+      "outcome": "won",
+      "ourScore": "121/3 (16.2)",
+      "theirScore": "120/8 (20)",
+      "summary": "Won by 7 wickets"
+    }
+  },
+  {
+    "id": "2026-10-11-opponent-a",
+    "date": "2026-10-11",
+    "time": "07:00",
+    "opponent": "Opponent A",
+    "venue": "Home ground",
+    "tournament": "Friendly",
+    "format": "T20",
+    "result": {
+      "outcome": "won",
+      "ourScore": "164/6 (20)",
+      "theirScore": "151/9 (20)",
+      "summary": "Won by 13 runs",
+      "playerOfMatch": "Player Five"
+    }
+  },
+  {
+    "id": "2026-10-18-opponent-b",
+    "date": "2026-10-18",
+    "time": "07:00",
+    "opponent": "Opponent B",
+    "venue": "Away ground",
+    "tournament": "Sample League",
+    "format": "T20",
+    "result": {
+      "outcome": "lost",
+      "ourScore": "132 (19.2)",
+      "theirScore": "133/4 (17.5)",
+      "summary": "Lost by 6 wickets"
+    }
+  },
+  {
+    "id": "2026-10-25-opponent-c",
+    "date": "2026-10-25",
+    "time": "07:00",
+    "opponent": "Opponent C",
+    "venue": "Home ground",
+    "tournament": "Sample League",
+    "format": "T20"
+  },
+  {
+    "id": "2026-11-01-opponent-d",
+    "date": "2026-11-01",
+    "time": "07:30",
+    "opponent": "Opponent D",
+    "venue": "Away ground",
+    "tournament": "Sample League",
+    "format": "T20"
+  }
+]
